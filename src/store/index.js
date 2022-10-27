@@ -10,7 +10,7 @@ export default new Vuex.Store({
         state.score ++
     },
     SCORE_DECREASE(state) {
-        state.score ++
+        state.score --
     },
   },
   actions: {

@@ -8,7 +8,7 @@
   <div class="scene__score" >{{score}}</div>
   <!-- <StopwatchItem  class="scene__stopwatch" /> -->
   <TrachItem 
-    v-for="(item, index) in garbageTypes" 
+    v-for="(item, index) in trashList" 
     :key="index" 
     :class="`scene__trach-${item.type}`" 
     :ref="item.ref"
@@ -45,19 +45,18 @@ name: 'GameScene',
     return {
         dragObject: {},
         garbageList: [],
-        garbageTypes: [
+        trashList: [
             {type: 'plastic', ref: 'trachPlastic', color: 'red'},
             {type: 'paper', ref: 'trachPaper', color: 'green'},
             {type: 'glass', ref: 'trachGlass', color: 'yellow'}
         ],
-        trachPlasticCoords: null,
-        trashActive: false,
         mooveX: 0,
         mooveY: 0,
         garbageWidth: 80,
         garbageHeight: 40,
-        min: 5,
-        max: 20
+        garbageMinAmount: 10,
+        garbageMaxAmount: 20,
+        garbageEndТumber: 0,
     }
   },
   computed: {
@@ -77,7 +76,7 @@ name: 'GameScene',
                 trash.offsetLeft <= this.mooveX + this.garbageWidth &&
                 trash.offsetLeft + trash.clientWidth >= this.mooveX
         if(resultCompar) {
-            const garbageType = this.garbageTypes.find(elem => elem.type === trash.dataset.type)
+            const garbageType = this.trashList.find(elem => elem.type === trash.dataset.type)
             trash.style.boxShadow = `0 0 20px ${garbageType.color}`
         } else {
             trash.style.boxShadow = ''
@@ -85,14 +84,14 @@ name: 'GameScene',
         return  resultCompar
     },
     generationGarbage() {
-        const  garbageAmount = this.generationRandomNumber(this.min, this.max)
-        for(let i=0; i<=garbageAmount; i++ ) {
+        this.garbageEndТumber = this.generationRandomNumber(this.garbageMinAmount, this.garbageMaxAmount)
+        for(let i=0; i<=this.garbageEndТumber; i++ ) {
             const offsetLeft = this.generationRandomNumber(80, window.innerWidth - 80)
             const offsetTop = this.generationRandomNumber(40, window.innerHeight - 40)
             this.garbageList.push({
                 left: offsetLeft + 'px',
                 top: offsetTop + 'px',
-                type: this.garbageTypes[this.generationRandomNumber(0, this.garbageTypes.length-1)].type
+                type: this.trashList[this.generationRandomNumber(0, this.trashList.length-1)].type
             })
         }
     },
@@ -130,13 +129,19 @@ name: 'GameScene',
         if (!this.dragObject.elem) return
         this.dragObject.elem.style.cursor = 'grab';
 
-        if(this.checkingInTrash(this.$refs.trachPlastic[0].$el)) {
-            if(this.dragObject.elem.dataset.type === 'plastic') {
-            this.dragObject.elem.parentNode.removeChild(this.dragObject.elem);
-            this.scoreIncrease()
-          }
-          this.$refs.trachPlastic[0].$el.style.boxShadow = ''
+        for(const trash of this.trashList) {
+            if(this.checkingInTrash(this.$refs[trash.ref][0].$el)) {
+                if (this.dragObject.elem.dataset.type === trash.type) {
+                    this.scoreIncrease()
+                } else {
+                    this.scoreDecrease()
+                }
+                this.dragObject.elem.parentNode.removeChild(this.dragObject.elem);
+            } else {
+                this.$refs.trachPlastic[0].$el.style.boxShadow = ''
+            }
         }
+
         this.dragObject = {}
         this.mooveX = 0
         this.mooveY = 0
@@ -173,12 +178,6 @@ name: 'GameScene',
   position: absolute;
   bottom: 0px;
   left: calc(80% - 80px);
-}
-
-.scene__trach:hover {
-    box-shadow:0 0 20px red;
-    -moz-box-shadow:0 0 20px red; 
-    -webkit-box-shadow:0 0 20px red;
 }
 
 .scene__stopwatch {
