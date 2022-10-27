@@ -1,6 +1,6 @@
 <template>
 <div class="garbage">
-  <span>{{ typeGarbage }}</span>
+  <span>{{ garbaGetype }}</span>
 </div>
 </template>
 
@@ -8,7 +8,7 @@
 export default {
 name: 'GarbageItem',
   props: {
-    typeGarbage: String
+    garbaGetype: String
   }
 }
 </script>
