@@ -23,9 +23,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #fefefe;
   background-color: #333333;
   height: 100vh;
   width: 100vw;
+  overflow: hidden;
 }
 </style>

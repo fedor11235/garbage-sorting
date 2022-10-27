@@ -5,8 +5,8 @@
   @mousemove="handlerMousemove"
   @mouseup="handlerMouseup"
 >
-  <div class="scene__score" >{{score}}</div>
-  <!-- <StopwatchItem  class="scene__stopwatch" /> -->
+  <span class="scene__score" >Your game score: {{score}}</span>
+  <StopwatchItem  class="scene__stopwatch" />
   <TrachItem 
     v-for="(item, index) in trashList" 
     :key="index" 
@@ -25,21 +25,24 @@
     :data-index="index"
     :style="{left:item.left, top:item.top}"
   />
+  <GameModal v-if="!gameProcessed"/>
 </div>
 </template>
 
 <script>
-// import StopwatchItem from '@/components/StopwatchItem.vue'
+import StopwatchItem from '@/components/StopwatchItem.vue'
 import { mapState, mapMutations } from 'vuex'
 import GarbageItem from '@/components/GarbageItem.vue'
 import TrachItem from '@/components/TrachItem.vue'
+import GameModal from '@/components/GameModal.vue'
 
 export default {
 name: 'GameScene',
   components: {
     GarbageItem,
     TrachItem,
-    // StopwatchItem
+    StopwatchItem,
+    GameModal
   },
   data() {
     return {
@@ -54,13 +57,13 @@ name: 'GameScene',
         mooveY: 0,
         garbageWidth: 80,
         garbageHeight: 40,
-        garbageMinAmount: 10,
-        garbageMaxAmount: 20,
+        garbageMinAmount: 15,
+        garbageMaxAmount: 25,
         garbageEndТumber: 0,
     }
   },
   computed: {
-    ...mapState(['score']),
+    ...mapState(['score', 'gameProcessed']),
   },
   mounted() {
     this.generationGarbage()
@@ -153,12 +156,14 @@ name: 'GameScene',
 <style>
 .scene {
     position: relative;
-    padding: 16px;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
 }
 
 .scene__score {
+    position: absolute;
+    top: 16px;
+    left: calc(50% - 69px);
     color: white;
 }
 
@@ -182,7 +187,7 @@ name: 'GameScene',
 
 .scene__stopwatch {
   position: absolute;
-  top: 16px;
+  top: 48px;
   left: calc(50% - 100px);
 }
 

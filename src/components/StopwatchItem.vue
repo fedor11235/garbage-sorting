@@ -3,17 +3,12 @@
     <svg>
         <circle class="stopwatch__progress" ref="progressBar" :stroke="colorTime" stroke-width="4" cx="100" cy="100" :r="radius" fill="transparent" />
     </svg>
-
-
     <h1 class="stopwatch__time" :style="{color: colorTime}">{{ time }}</h1>
-
-    <div v-if="!running" class="stopwatch__backdrop">
-        <button @click="handlerStart" class="stopwatch__start"> Start </button>
-    </div>
 </div>
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex'
 export default {
 name: 'StopwatchItem',
 data() {
@@ -21,10 +16,8 @@ data() {
         timeBegan: null,
         deadline: null,
         started: null,
-        running: false,
         time: '01:00.000',
-        diffMin: 0,
-        diffSec: 5,
+        diffMin: 1,
         colorTime: 'white',
 
         radius: 92,
@@ -32,35 +25,40 @@ data() {
         offset: null
     }
 },
+watch: {
+    gameProcessed(val) {
+        if(val) {
+            this.timeBegan = new Date();
+            this.deadline = new Date(
+                this.timeBegan.getFullYear(), 
+                this.timeBegan.getMonth(),
+                this.timeBegan.getDate(),
+
+                this.timeBegan.getHours(),
+                this.timeBegan.getMinutes() + this.diffMin,
+                this.timeBegan.getSeconds(),
+                this.timeBegan.getMilliseconds()
+            )
+            
+            this.started = setInterval(this.clockRunning, 10);
+        }
+    }
+},
+computed: {
+    ...mapState(['gameProcessed'])
+},
 mounted() {
     this.circumference = 2 * Math.PI * this.radius
     this.$refs.progressBar.style.strokeDasharray = `${this.circumference} ${this.circumference}`
     this.setProgress(100)
 },
 methods: {
+    ...mapMutations({
+      gameStop: 'GAME_STOP'
+    }),
     setProgress(parcent) {
         this.offset = this.circumference - parcent / 100 * this.circumference
         this.$refs.progressBar.style.strokeDashoffset = this.offset 
-    },
-    handlerStart() {
-    if(this.running) return;
-    
-    if (this.timeBegan === null) {
-        this.timeBegan = new Date();
-        this.deadline = new Date(
-            this.timeBegan.getFullYear(), 
-            this.timeBegan.getMonth(),
-            this.timeBegan.getDate(),
-
-            this.timeBegan.getHours(),
-            this.timeBegan.getMinutes() + this.diffMin,
-            this.timeBegan.getSeconds() + this.diffSec,
-            this.timeBegan.getMilliseconds()
-        )
-    }
-
-    this.started = setInterval(this.clockRunning, 1);	
-    this.running = true;
     },
     clockRunning(){
         let currentTime = new Date()
@@ -84,7 +82,7 @@ methods: {
             this.zeroPrefix(ms, 3);
     },
     stop() {
-        this.running = false;
+        this.gameStop();
         this.timeBegan = null
         clearInterval(this.started);
         this.time = '01:00.000'
@@ -125,31 +123,5 @@ methods: {
     position: absolute;
     top: calc(50% - 40px);
     left: calc(50% - 72px);
-}
-
-.stopwatch__backdrop {
-    position: fixed;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.25);
-}
-.stopwatch__start {
-    cursor: pointer;
-    background-color: #fdfdfd;
-    width: 100px;
-    height: 40px;
-    font-size: 21px;
-    font-weight: 500;
-    border-radius: 12px;
-    border: none;
-    transition: background-color 400ms;
-}
-.stopwatch__start:hover {
-    background-color: #929292;
 }
 </style>

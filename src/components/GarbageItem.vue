@@ -13,7 +13,6 @@ name: 'GarbageItem',
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .garbage {
     width: 80px;
@@ -21,6 +20,7 @@ name: 'GarbageItem',
     line-height: 40px;
     border-radius: 16px;
     background-color: #eae8e8;
+    color: #1a1a1a;
 
     -moz-user-select: none;
     -khtml-user-select: none;
