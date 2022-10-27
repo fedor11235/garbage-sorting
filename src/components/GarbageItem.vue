@@ -21,5 +21,9 @@ name: 'GarbageItem',
     line-height: 40px;
     border-radius: 16px;
     background-color: #eae8e8;
+
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
 }
 </style>
